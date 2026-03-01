@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routine Calendar</title><style>
+
+body{
+font-family:Arial;
+background:#0f2027;
+color:white;
+margin:0;
+padding:20px;
+text-align:center;
+}
+
+h1{
+margin-bottom:10px;
+}
+
+.calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
+max-width:900px;
+margin:auto;
+}
+
+.day{
+background:#1c2b36;
+padding:15px;
+border-radius:8px;
+min-height:100px;
+cursor:pointer;
+}
+
+.day:hover{
+background:#2c3e50;
+}
+
+.task{
+background:#4CAF50;
+padding:4px;
+margin-top:5px;
+border-radius:4px;
+font-size:12px;
+}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:#1c2b36;
+padding:20px;
+border-radius:10px;
+width:300px;
+}
+
+input,button{
+padding:8px;
+margin:5px;
+border:none;
+border-radius:5px;
+}
+
+button{
+background:#4CAF50;
+color:white;
+cursor:pointer;
+}
+
+.delete{
+background:red;
+}
+
+</style></head><body><h1>Routine Calendar</h1><div class="calendar" id="calendar"></div><div class="modal" id="modal">
+<div class="modal-content"><h3>Add Plan</h3><input id="taskText" placeholder="Task"><br>
+<input type="time" id="taskTime"><br>
+
+<button onclick="saveTask()">Save</button>
+<button onclick="closeModal()">Close</button>
+
+</div>
+</div><script>
+
+let tasks = JSON.parse(localStorage.getItem("calendarTasks")) || {}
+let selectedDay = null
+
+function generateCalendar(){
+
+let cal=document.getElementById("calendar")
+cal.innerHTML=""
+
+for(let i=1;i<=30;i++){
+
+let day=document.createElement("div")
+day.className="day"
+
+day.innerHTML="<b>"+i+"</b>"
+
+if(tasks[i]){
+
+tasks[i].forEach(t=>{
+let div=document.createElement("div")
+div.className="task"
+div.innerText=t.time+" "+t.text
+day.appendChild(div)
+})
+
+}
+
+day.onclick=()=>openModal(i)
+
+cal.appendChild(day)
+
+}
+
+}
+
+function openModal(day){
+
+selectedDay=day
+document.getElementById("modal").style.display="flex"
+
+}
+
+function closeModal(){
+
+document.getElementById("modal").style.display="none"
+
+}
+
+function saveTask(){
+
+let text=document.getElementById("taskText").value
+let time=document.getElementById("taskTime").value
+
+if(!tasks[selectedDay]){
+tasks[selectedDay]=[]
+}
+
+tasks[selectedDay].push({text,time})
+
+localStorage.setItem("calendarTasks",JSON.stringify(tasks))
+
+closeModal()
+generateCalendar()
+
+}
+
+function checkReminder(){
+
+let now=new Date()
+let h=String(now.getHours()).padStart(2,'0')
+let m=String(now.getMinutes()).padStart(2,'0')
+let current=h+":"+m
+
+let today=now.getDate()
+
+if(tasks[today]){
+
+tasks[today].forEach(t=>{
+
+if(t.time===current){
+
+if(Notification.permission==="granted"){
+
+new Notification("Reminder",{
+body:t.text
+})
+
+}
+
+}
+
+})
+
+}
+
+}
+
+if(Notification.permission!=="granted"){
+Notification.requestPermission()
+}
+
+setInterval(checkReminder,60000)
+
+generateCalendar()
+
+</script></body>
+</html>
