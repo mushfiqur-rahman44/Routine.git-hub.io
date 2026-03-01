@@ -1,15 +1,11 @@
-<!DOCTYPE html><html><head>
-
-<meta charset="UTF-8">
+<!DOCTYPE html><html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Routine Planner</title><style>body{
 margin:0;
 font-family:Arial;
 background:#f2f5f9;
 text-align:center;
-}
-
-/* header */
+}/* header */
 
 header{
 background:#4CAF50;
@@ -132,9 +128,10 @@ display:none;
 
 </style></head><body>
 
-<header><button onclick="prevMonth()">⬅</button>
+<header>
+<button onclick="prevMonth()">⬅</button><h2 id="monthTitle">Routine Planner - Created by MR (Mushfiqur Rahman)</h2><button onclick="nextMonth()">➡</button>
 
-<h2 id="monthTitle">Routine Planner - Created by MR (Mushfiqur Rahman)</h2><button onclick="nextMonth()">➡</button>
+<button onclick="resetAllTasks()" style="background:red;color:white;border:none;padding:6px 10px;border-radius:5px;">Reset</button>
 
 </header><div class="progress-box">
 <h3>Today's Progress</h3>
@@ -150,10 +147,9 @@ display:none;
 <p id="monthProgressText">0%</p>
 </div><div class="calendar" id="calendar"></div><div class="modal" id="modal">
 <div class="modal-content">
-<h3>Add Routine</h3><input id="taskText" placeholder="Task"><br>
-<input type="time" id="taskTime"><br>
-
-<select id="taskType">
+<h3>Add Routine</h3>
+<input id="taskText" placeholder="Task"><br>
+<input type="time" id="taskTime"><br><select id="taskType">
 <option value="study">Study</option>
 <option value="work">Work</option>
 <option value="health">Health</option>
@@ -189,8 +185,6 @@ months[month]+" "+year+" - Created by MR (Mushfiqur Rahman)"
 let cal=document.getElementById("calendar")
 
 cal.innerHTML=""
-
-/* weekday */
 
 weekdays.forEach(d=>{
 
@@ -251,30 +245,22 @@ updateMonthlyProgress()
 }
 
 function prevMonth(){
-
 date.setMonth(date.getMonth()-1)
 renderCalendar()
-
 }
 
 function nextMonth(){
-
 date.setMonth(date.getMonth()+1)
 renderCalendar()
-
 }
 
 function openModal(key){
-
 selectedKey=key
 document.getElementById("modal").style.display="flex"
-
 }
 
 function closeModal(){
-
 document.getElementById("modal").style.display="none"
-
 }
 
 function saveTask(){
@@ -316,13 +302,11 @@ let key=today.getFullYear()+"-"+today.getMonth()+"-"+today.getDate()
 if(!tasks[key]) return
 
 let total=tasks[key].length
-
 let done=tasks[key].filter(t=>t.done).length
 
 let percent=Math.round((done/total)*100)
 
 document.getElementById("progress").style.width=percent+"%"
-
 document.getElementById("progressText").innerText=percent+"%"
 
 }
@@ -342,10 +326,8 @@ let parts=key.split("-")
 if(parts[0]==year && parts[1]==month){
 
 tasks[key].forEach(t=>{
-
 total++
 if(t.done) done++
-
 })
 
 }
@@ -358,6 +340,22 @@ let percent=Math.round((done/total)*100)
 
 document.getElementById("monthProgress").style.width=percent+"%"
 document.getElementById("monthProgressText").innerText=percent+"%"
+
+}
+
+function resetAllTasks(){
+
+let confirmReset=confirm("Delete all tasks?")
+
+if(confirmReset){
+
+localStorage.removeItem("routineTasks")
+
+tasks={}
+
+renderCalendar()
+
+}
 
 }
 
