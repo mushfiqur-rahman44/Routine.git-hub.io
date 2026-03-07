@@ -1,12 +1,13 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Routine Planner</title><style>body{
+<title>Routine Planner</title>
+<style>
+body{
 margin:0;
 font-family:Arial;
 background:#f2f5f9;
 text-align:center;
-}/* header */
-
+}
 header{
 background:#4CAF50;
 color:white;
@@ -16,9 +17,6 @@ justify-content:center;
 gap:10px;
 flex-wrap:wrap;
 }
-
-/* progress */
-
 .progress-box{
 width:90%;
 max-width:600px;
@@ -28,22 +26,17 @@ padding:10px;
 border-radius:10px;
 box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
-
 .progress-bar{
 height:20px;
 background:#ddd;
 border-radius:10px;
 overflow:hidden;
 }
-
 .progress{
 height:100%;
 background:#4CAF50;
 width:0%;
 }
-
-/* calendar */
-
 .calendar{
 display:grid;
 grid-template-columns:repeat(7,1fr);
@@ -52,14 +45,12 @@ padding:10px;
 max-width:1000px;
 margin:auto;
 }
-
 .weekday{
 font-weight:bold;
 background:#ddd;
 padding:8px;
 border-radius:5px;
 }
-
 .day{
 background:white;
 border-radius:8px;
@@ -67,6 +58,12 @@ padding:8px;
 min-height:90px;
 cursor:pointer;
 box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* ⭐ Added for today highlight */
+.today{
+border:3px solid #00BFFF;
+background:#e6f7ff;
 }
 
 .task{
@@ -79,16 +76,10 @@ display:flex;
 align-items:center;
 gap:3px;
 }
-
-/* colors */
-
 .study{background:#4CAF50;}
 .work{background:#FF9800;}
 .health{background:#E91E63;}
 .other{background:#2196F3;}
-
-/* modal */
-
 .modal{
 position:fixed;
 top:0;
@@ -100,70 +91,79 @@ display:none;
 justify-content:center;
 align-items:center;
 }
-
 .modal-content{
 background:white;
 padding:20px;
 border-radius:10px;
 width:280px;
 }
-
 input,select{
 width:90%;
 padding:8px;
 margin:5px;
 }
-
 @media(max-width:600px){
-
 .calendar{
 grid-template-columns:repeat(2,1fr);
 }
-
 .weekday{
 display:none;
 }
-
 }
-
 </style></head><body>
 
 <header>
-<button onclick="prevMonth()">⬅</button><h2 id="monthTitle">Routine Planner - Created by MR (Mushfiqur Rahman)</h2><button onclick="nextMonth()">➡</button>
+<button onclick="prevMonth()">⬅</button>
 
+<h2 id="monthTitle">
+Routine Planner - Created by MR 
+<a href="https://www.facebook.com/share/1D8EAvXxnN/" target="_blank" style="color:#00BFFF;text-decoration:none;">
+(Mushfiqur Rahman)
+</a>
+</h2>
+
+<button onclick="nextMonth()">➡</button>
 <button onclick="resetAllTasks()" style="background:red;color:white;border:none;padding:6px 10px;border-radius:5px;">Reset</button>
+</header>
 
-</header><div class="progress-box">
+<div class="progress-box">
 <h3>Today's Progress</h3>
 <div class="progress-bar">
 <div class="progress" id="progress"></div>
 </div>
 <p id="progressText">0%</p>
-</div><div class="progress-box">
+</div>
+
+<div class="progress-box">
 <h3>Monthly Progress</h3>
 <div class="progress-bar">
 <div class="progress" id="monthProgress"></div>
 </div>
 <p id="monthProgressText">0%</p>
-</div><div class="calendar" id="calendar"></div><div class="modal" id="modal">
+</div>
+
+<div class="calendar" id="calendar"></div>
+
+<div class="modal" id="modal">
 <div class="modal-content">
 <h3>Add Routine</h3>
 <input id="taskText" placeholder="Task"><br>
-<input type="time" id="taskTime"><br><select id="taskType">
+<input type="time" id="taskTime"><br>
+<select id="taskType">
 <option value="study">Study</option>
 <option value="work">Work</option>
 <option value="health">Health</option>
 <option value="other">Other</option>
-</select><br><button onclick="saveTask()">Save</button>
+</select><br>
+<button onclick="saveTask()">Save</button>
 <button onclick="closeModal()">Close</button>
-
 </div>
-</div><script>
+</div>
+
+<script>
 
 let date=new Date()
-
 let tasks=JSON.parse(localStorage.getItem("routineTasks"))||{}
-
 let selectedKey=null
 
 const weekdays=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -179,32 +179,28 @@ function renderCalendar(){
 let year=date.getFullYear()
 let month=date.getMonth()
 
-document.getElementById("monthTitle").innerText=
-months[month]+" "+year+" - Created by MR (Mushfiqur Rahman)"
+document.getElementById("monthTitle").innerHTML=
+months[month]+" "+year+" - Created by MR <a href='https://www.facebook.com/share/1D8EAvXxnN/' target='_blank' style='color:#00BFFF;text-decoration:none;'>(Mushfiqur Rahman)</a>"
 
 let cal=document.getElementById("calendar")
-
 cal.innerHTML=""
 
 weekdays.forEach(d=>{
-
 let w=document.createElement("div")
 w.className="weekday"
 w.innerText=d
 cal.appendChild(w)
-
 })
 
 let firstDay=new Date(year,month,1).getDay()
-
 let daysInMonth=new Date(year,month+1,0).getDate()
 
 for(let i=0;i<firstDay;i++){
-
 let blank=document.createElement("div")
 cal.appendChild(blank)
-
 }
+
+let today=new Date()
 
 for(let d=1;d<=daysInMonth;d++){
 
@@ -214,17 +210,27 @@ let day=document.createElement("div")
 day.className="day"
 day.innerHTML="<b>"+d+"</b>"
 
+/* ⭐ Added today highlight logic */
+if(
+d===today.getDate() &&
+month===today.getMonth() &&
+year===today.getFullYear()
+){
+day.classList.add("today")
+}
+
 if(tasks[key]){
 
 tasks[key].forEach((t,index)=>{
 
 let div=document.createElement("div")
-
 div.className="task "+t.type
 
 div.innerHTML=`
-<input type="checkbox" onchange="toggleTask('${key}',${index})">
+<input type="checkbox" ${t.done ? "checked" : ""} onchange="toggleTask('${key}',${index});event.stopPropagation()">
 ${t.time} ${t.text}
+<button onclick="editTask('${key}',${index});event.stopPropagation()">✏</button>
+<button onclick="deleteTask('${key}',${index});event.stopPropagation()">🗑</button>
 `
 
 day.appendChild(div)
@@ -234,7 +240,6 @@ day.appendChild(div)
 }
 
 day.onclick=()=>openModal(key)
-
 cal.appendChild(day)
 
 }
@@ -293,10 +298,44 @@ updateMonthlyProgress()
 
 }
 
+function editTask(key,index){
+
+let task=tasks[key][index]
+
+let newText=prompt("Edit task",task.text)
+if(newText===null) return
+
+let newTime=prompt("Edit time",task.time)
+if(newTime===null) return
+
+task.text=newText
+task.time=newTime
+
+localStorage.setItem("routineTasks",JSON.stringify(tasks))
+renderCalendar()
+
+}
+
+function deleteTask(key,index){
+
+if(confirm("Delete this task?")){
+
+tasks[key].splice(index,1)
+
+if(tasks[key].length===0){
+delete tasks[key]
+}
+
+localStorage.setItem("routineTasks",JSON.stringify(tasks))
+renderCalendar()
+
+}
+
+}
+
 function updateProgress(){
 
 let today=new Date()
-
 let key=today.getFullYear()+"-"+today.getMonth()+"-"+today.getDate()
 
 if(!tasks[key]) return
@@ -352,7 +391,6 @@ if(confirmReset){
 localStorage.removeItem("routineTasks")
 
 tasks={}
-
 renderCalendar()
 
 }
@@ -361,4 +399,5 @@ renderCalendar()
 
 renderCalendar()
 
-</script></body></html>
+</script>
+</body></html>
